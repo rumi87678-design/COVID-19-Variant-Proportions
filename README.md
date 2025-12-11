@@ -16,6 +16,6 @@ Features:
 Primary Variant: JN.1 (45% prevalence)
 Tech Stack: HTML5, CSS3, Bioinformatic analysis integration
 
-Simply open variant_tracker.html in any browser to view the dashboard. No dependencies required.
+Simply open variant_tracker.html or pie_chart.html in any browser to view the dashboard. No dependencies required.
 
 
