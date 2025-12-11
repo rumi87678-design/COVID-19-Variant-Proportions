@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বাংলাদেশ কোভিড ভ্যারিয়েন্ট ট্র্যাকার | Bangladesh COVID Tracker</title>
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans Bengali', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%);
+            color: #1a2b3c;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        .page-header {
+            background: linear-gradient(to right, #006a4e, #1a5c32);
+            color: white;
+            padding: 35px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 106, 78, 0.25);
+        }
+        
+        .page-header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        .flag-icon {
+            display: inline-block;
+            width: 35px;
+            height: 22px;
+            background: linear-gradient(to right, #006a4e 50%, #f42a41 50%);
+            border-radius: 3px;
+            margin: 0 12px;
+            vertical-align: middle;
+        }
+        
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+            border-top: 5px solid #1a5c32;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .stat-icon {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #1a5c32;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #5d6d7e;
+            font-size: 0.95rem;
+        }
+        
+        /* Alert Box */
+        .alert-box {
+            background: linear-gradient(to right, #fff3cd, #ffeaa7);
+            border-left: 6px solid #f39c12;
+            padding: 20px 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        
+        .alert-title {
+            color: #856404;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+        
+        /* Variants Section */
+        .section-title {
+            color: #1a5c32;
+            font-size: 1.8rem;
+            margin: 35px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2ecc71;
+        }
+        
+        .variants-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+        
+        .variant-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 5px solid;
+        }
+        
+        .variant-info {
+            flex: 1;
+        }
+        
+        .variant-name {
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .variant-description {
+            color: #5d6d7e;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        
+        .progress-container {
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 14px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: bold;
+            width: 45%; /* JN.1 */
+        }
+        
+        .variant-percentage {
+            font-size: 1.9rem;
+            font-weight: bold;
+            margin-left: 20px;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        /* Timeline */
+        .timeline-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+        
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #1a5c32;
+            z-index: 1;
+        }
+        
+        .timeline-point {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 24%;
+        }
+        
+        .point-circle {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 4px solid #1a5c32;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+        }
+        
+        .point-date {
+            font-weight: bold;
+            color: #1a5c32;
+            margin-bottom: 5px;
+        }
+        
+        .point-data {
+            font-size: 0.9rem;
+            color: #5d6d7e;
+        }
+        
+        /* Technology Tags */
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .tech-tag {
+            background: #1a5c32;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .tech-tag.html { background: #e34c26; }
+        .tech-tag.css { background: #264de4; }
+        .tech-tag.python { background: #3776ab; }
+        .tech-tag.bio { background: #27ae60; }
+        
+        /* Footer */
+        .page-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 25px;
+            background: #1a5c32;
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .footer-links {
+            margin-top: 15px;
+        }
+        
+        .footer-link {
+            color: #a3e4d7;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .page-header {
+                padding: 25px 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .variant-row {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .variant-percentage {
+                margin: 10px 0 0;
+            }
+            
+            .timeline {
+                flex-direction: column;
+                gap: 25px;
+            }
+            
+            .timeline::before {
+                display: none;
+            }
+            
+            .timeline-point {
+                width: 100%;
+                text-align: left;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .point-circle {
+                margin: 0;
+                min-width: 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .flag-icon {
+                width: 30px;
+                height: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <h1>
+                <span class="flag-icon"></span>
+                বাংলাদেশ কোভিড-১৯ ভ্যারিয়েন্ট ট্র্যাকার
+                <span class="flag-icon"></span>
+            </h1>
+            <p>জিনোমিক নজরদারি ও বায়োইনফরমেটিক্স বিশ্লেষণ</p>
+            <p style="margin-top: 15px; font-size: 1rem;">
+                📅 সর্বশেষ হালনাগাদ: মার্চ ২০২৪ | 🏥 তথ্য উৎস: আইইডিসিআর বাংলাদেশ
+            </p>
+        </header>
+        
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🧬</div>
+                <div class="stat-number">১,২৪৭</div>
+                <div class="stat-label">জিনোম সিকোয়েন্স বিশ্লেষিত</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🗺️</div>
+                <div class="stat-number">৮</div>
+                <div class="stat-label">বিভাগ থেকে নমুনা</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-number">JN.1</div>
+                <div class="stat-label">সর্বাধিক প্রভাবশালী ভ্যারিয়েন্ট</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-number">L455S</div>
+                <div class="stat-label">স্পাইক প্রোটিন মিউটেশন</div>
+            </div>
+        </div>
+        
+        <!-- Alert Box -->
+        <div class="alert-box">
+            <div class="alert-title">🚨 জনস্বাস্থ্য সতর্কতা</div>
+            <p>JN.1 ভ্যারিয়েন্টে দ্রুত ছড়ানোর ক্ষমতা রয়েছে। বয়স্ক ও কম রোগপ্রতিরোধ ক্ষমতা সম্পন্ন ব্যক্তিদের সতর্কতা অবলম্বন করা প্রয়োজন। গণজমায়েতে মাস্ক ব্যবহার ও সামাজিক দূরত্ব বজায় রাখুন।</p>
+        </div>
+        
+        <!-- Variant Distribution -->
+        <h2 class="section-title">📊 বর্তমান ভ্যারিয়েন্ট বন্টন (মার্চ ২০২৪)</h2>
+        
+        <div class="variants-container">
+            <!-- Variant 1: JN.1 -->
+            <div class="variant-row" style="border-left-color: #e74c3c;">
+                <div class="variant-info">
+                    <div class="variant-name">ওমিক্রন JN.1</div>
+                    <div class="variant-description">সর্বাধিক প্রভাবশালী ভ্যারিয়েন্ট, দ্রুত ছড়ায়, ইমিউন এস্কেপ বৈশিষ্ট্য রয়েছে</div>
+                    <div class="progress-container">
+                        <div class="progress-fill" style="background-color: #e74c3c; width: 45%;">
+                            ৪৫%
+                        </div>
+                    </div>
+                </div>
+                <div class="variant-percentage" style="color: #e74c3c;">
+                    ৪৫%
+                </div>
+            </div>
+            
+            <!-- Variant 2: XBB.1.5 -->
+            <div class="variant-row" style="border-left-color: #f39c12;">
+                <div class="variant-info">
+                    <div class="variant-name">ওমিক্রন XBB.1.5</div>
+                    <div class="variant-description">পূর্বের প্রভাবশালী ভ্যারিয়েন্ট, এখন হ্রাস পাচ্ছে</div>
+                    <div class="progress-container">
+                        <div class="progress-fill" style="background-color: #f39c12; width: 25%;">
+                            ২৫%
+                        </div>
+                    </div>
+                </div>
+                <div class="variant-percentage" style="color: #f39c12;">
+                    ২৫%
+                </div>
+            </div>
+            
+            <!-- Variant 3: BA.2.86 -->
+            <div class="variant-row" style="border-left-color: #3498db;">
+                <div class="variant-info">
+                    <div class="variant-name">ওমিক্রন BA.2.86</div>
+                    <div class="variant-description">নতুন শনাক্ত ভ্যারিয়েন্ট, পর্যবেক্ষণাধীন, মিউটেশন সংখ্যা বেশি</div>
+                    <div class="progress-container">
+                        <div class="progress-fill" style="background-color: #3498db; width: 15%;">
+                            ১৫%
+                        </div>
+                    </div>
+                </div>
+                <div class="variant-percentage" style="color: #3498db;">
+                    ১৫%
+                </div>
+            </div>
+            
+            <!-- Variant 4: Others -->
+            <div class="variant-row" style="border-left-color: #95a5a6;">
+                <div class="variant-info">
+                    <div class="variant-name">অন্যান্য ভ্যারিয়েন্ট</div>
+                    <div class="variant-description">বিভিন্ন প্রকারের ভ্যারিয়েন্ট, সামগ্রিক প্রভাব অল্প</div>
+                    <div class="progress-container">
+                        <div class="progress-fill" style="background-color: #95a5a6; width: 15%;">
+                            ১৫%
+                        </div>
+                    </div>
+                </div>
+                <div class="variant-percentage" style="color: #95a5a6;">
+                    ১৫%
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timeline -->
+        <h2 class="section-title">📅 ভ্যারিয়েন্ট সময়রেখা (ডিসেম্বর ২০২৩ - মার্চ ২০২৪)</h2>
+        
+        <div class="timeline-container">
+            <div class="timeline">
+                <div class="timeline-point">
+                    <div class="point-circle"></div>
+                    <div class="point-date">ডিসেম্বর ২০২৩</div>
+                    <div class="point-data">
+                        XBB: ৬০%<br>
+                        JN.1: ৫%<br>
+                        অন্যান্য: ৩৫%
+                    </div>
+                </div>
+                
+                <div class="timeline-point">
+                    <div class="point-circle"></div>
+                    <div class="point-date">জানুয়ারি ২০২৪</div>
+                    <div class="point-data">
+                        XBB: ৪০%<br>
+                        JN.1: ৩৫%<br>
+                        অন্যান্য: ২৫%
+                    </div>
+                </div>
+                
+                <div class="timeline-point">
+                    <div class="point-circle"></div>
+                    <div class="point-date">ফেব্রুয়ারি ২০২৪</div>
+                    <div class="point-data">
+                        XBB: ২৫%<br>
+                        JN.1: ৪৫%<br>
+                        BA.2.86: ১০%
+                    </div>
+                </div>
+                
+                <div class="timeline-point">
+                    <div class="point-circle"></div>
+                    <div class="point-date">মার্চ ২০২৪</div>
+                    <div class="point-data">
+                        JN.1: ৪৫%<br>
+                        XBB: ২৫%<br>
+                        BA.2.86: ১৫%
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                <p><strong>ট্রেন্ড বিশ্লেষণ:</strong> JN.1 ভ্যারিয়েন্ট ডিসেম্বর থেকে মার্চ মাস পর্যন্ত দ্রুত বৃদ্ধি পেয়েছে এবং বর্তমানে প্রধান ভ্যারিয়েন্ট হিসেবে প্রতিষ্ঠিত হয়েছে।</p>
+            </div>
+        </div>
+        
+        <!-- Technology Section -->
+        <h2 class="section-title">💻 ব্যবহৃত প্রযুক্তি</h2>
+        
+        <div style="background: white; border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.06);">
+            <div class="tech-tags">
+                <span class="tech-tag html">HTML5</span>
+                <span class="tech-tag css">CSS3</span>
+                <span class="tech-tag python">Python (বায়োইনফরমেটিক্স বিশ্লেষণ)</span>
+                <span class="tech-tag bio">বায়োইনফরমেটিক্স</span>
+            </div>
+            
+            <div style="margin-top: 25px;">
+                <h3 style="color: #1a5c32; margin-bottom: 15px;">🎯 প্রজেক্ট বৈশিষ্ট্য</h3>
+                <ul style="list-style-position: inside; color: #5d6d7e;">
+                    <li style="margin-bottom: 8px;">সম্পূর্ণরূপে HTML ও CSS ব্যবহার করে তৈরি</l
+                    <li style="margin-bottom: 8px;">রেসপন্সিভ ডিজাইন - সব ডিভাইসে কাজ করে</li>
+                    <li style="margin-bottom: 8px;">বায়োইনফরমেটিক্স ডাটা ভিজ্যুয়ালাইজেশন</li>
+                    <li style="margin-bottom: 8px;">জনস্বাস্থ্য তথ্য উপস্থাপনা</li>
+                </ul>
+            </div>
+            
+        
+        
+        <!-- Footer -->
+        <footer class="page-footer">
+            <p>🧬 <strong>বায়োইনফরমেটিক্স ও জনস্বাস্থ্য ডাটা ভিজ্যুয়ালাইজেশন প্রজেক্ট</strong></p>
+            <p>এটি একটি শিক্ষার্থী প্রজেক্ট যা বায়োইনফরমেটিক্সে আগ্রহী এক শিক্ষার্থীর তৈরি</p>
+            
+            <div class="footer-links">
+                <a href="#" class="footer-link">GISAID ডাটাবেজ</a> | 
+                <a href="#" class="footer-link">IEDCR বাংলাদেশ</a> | 
+                <a href="#" class="footer-link">WHO কোভিড আপডেট</a>
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #c8e6c9;">
+                ❤️ জনস্বাস্থ্য সুরক্ষায় তথ্য প্রযুক্তির ব্যবহার | সর্বস্বত্ব সংরক্ষিত ২০২৪
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
